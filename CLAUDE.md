@@ -81,4 +81,16 @@ JSON schema Claude generates matches `currentUpdate.financials` exactly, with op
 
 ## Git workflow
 
-All changes should be committed with descriptive messages and pushed to `origin/master` (GitHub: `seamuscrawford1/investor-update`). No CI/CD pipeline exists.
+After every meaningful piece of work — a new feature, a bug fix, a content/template change — commit and push immediately. Do not batch multiple unrelated changes into one commit.
+
+```bash
+git add <specific-files>
+git commit -m "Short imperative summary
+
+Optional body explaining what changed and why."
+git push
+```
+
+- Remote: `origin/master` (GitHub: `seamuscrawford1/investor-update`)
+- No CI/CD pipeline
+- Always push after committing so GitHub always reflects the latest state
