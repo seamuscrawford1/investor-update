@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investor Update</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep:   #1a1a2e;
+      --bg-card:   #16213e;
+      --bg-input:  #0f3460;
+      --accent:    #e94560;
+      --blue:      #a8dadc;
+      --text:      #eeeeee;
+      --muted:     #888888;
+      --border:    #2a2a4a;
+      --tl-red:    #e94560;
+      --tl-amber:  #f4a261;
+      --tl-green:  #52b788;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: 210px;
+      min-height: 100vh;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.2rem 0.8rem;
+      gap: 0.4rem;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+
+    #sidebar h3 {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      padding: 0 0.2rem;
+    }
+
+    .sidebar-month-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 0.45rem 0.7rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
+    }
+    .sidebar-month-btn:hover { background: #1a3a6e; }
+    .sidebar-month-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    #btn-new-sidebar {
+      margin-top: auto;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 0.6rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    #btn-new-sidebar:hover { background: #c73652; }
+
+    #sidebar-empty {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-style: italic;
+      padding: 0.3rem 0.2rem;
+    }
+
+    /* ── MAIN ── */
+    #main {
+      flex: 1;
+      padding: 1.5rem 2.5rem 3rem;
+      max-width: 960px;
+    }
+
+    /* ── TOOLBAR ── */
+    #toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+      padding: 1rem 1.2rem;
+      background: var(--bg-card);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    #toolbar input[type="text"] {
+      flex: 1;
+      min-width: 160px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    #toolbar input[type="text"]:focus { outline: 2px solid var(--accent); }
+    #toolbar input[type="text"]::placeholder { color: var(--muted); font-weight: 400; }
+
+    #toolbar select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    #toolbar select:focus { outline: 2px solid var(--accent); }
+
+    .toolbar-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .toolbar-btn:hover { background: #1a3a6e; }
+
+    #btn-print {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+    #btn-print:hover { background: #c73652; }
+
+    #dirty-indicator {
+      color: var(--accent);
+      font-size: 1.1rem;
+      line-height: 1;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    #dirty-indicator.visible { opacity: 1; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.05rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── INPUTS ── */
+    textarea, input[type="text"].cell-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      width: 100%;
+      resize: vertical;
+    }
+    textarea:focus, input[type="text"].cell-input:focus { outline: 2px solid var(--accent); }
+
+    #exec-summary { min-height: 140px; }
+
+    /* ── TABLES ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    thead th {
+      background: var(--bg-input);
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.6rem 0.7rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+
+    td {
+      padding: 0.5rem 0.4rem;
+      vertical-align: middle;
+    }
+
+    td input[type="text"].cell-input {
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .btn-del {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .btn-del:hover { color: var(--accent); }
+
+    .add-row-btn {
+      margin-top: 0.8rem;
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .add-row-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    .empty-state {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 1.2rem;
+    }
+
+    /* ── TREND SELECT ── */
+    select.trend-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 0.4rem 0.4rem;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 80px;
+    }
+    select.trend-select.up   { color: var(--tl-green); }
+    select.trend-select.down { color: var(--tl-red); }
+    select.trend-select.flat { color: var(--muted); }
+
+    /* ── TRAFFIC LIGHT ── */
+    .tl-cell { display: flex; align-items: center; gap: 0.5rem; }
+
+    .tl-dot {
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+    .tl-dot.red   { color: var(--tl-red); }
+    .tl-dot.amber { color: var(--tl-amber); }
+    .tl-dot.green { color: var(--tl-green); }
+
+    select.tl-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 0.35rem 0.4rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    tr.tl-red-row   { border-left: 3px solid var(--tl-red); }
+    tr.tl-amber-row { border-left: 3px solid var(--tl-amber); }
+    tr.tl-green-row { border-left: 3px solid var(--tl-green); }
+
+    /* ── FINANCIALS GRID ── */
+    #financials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .fin-field label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .fin-field input {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.55rem 0.8rem;
+      font-size: 0.95rem;
+      width: 100%;
+    }
+    .fin-field input:focus { outline: 2px solid var(--accent); }
+
+    #financial-notes-label {
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    /* ── ASKS ── */
+    .ask-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .ask-item input[type="text"] {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      font-size: 0.9rem;
+    }
+    .ask-item input[type="text"]:focus { outline: 2px solid var(--accent); }
+
+    select.cat-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem 0.5rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .cat-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .cat-Intro    { background: #1e4a7a; color: var(--blue); }
+    .cat-Advice   { background: #4a2e0a; color: var(--tl-amber); }
+    .cat-Resource { background: #0a3a1e; color: var(--tl-green); }
+    .cat-Other    { background: #2a2a4a; color: var(--muted); }
+
+    /* ── PRINT HEADER ── */
+    #print-header { display: none; }
+
+    /* ══════════════════════════════
+       PRINT STYLES
+    ══════════════════════════════ */
+    @media print {
+      *, *::before, *::after {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border-color: #ccc !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body { display: block; font-family: 'Segoe UI', Georgia, serif; font-size: 10pt; }
+
+      #sidebar, #toolbar, .add-row-btn, .btn-del, .no-print { display: none !important; }
+
+      #main { padding: 0; max-width: 100%; }
+
+      #print-header {
+        display: block !important;
+        margin-bottom: 18pt;
+        padding-bottom: 8pt;
+        border-bottom: 2pt solid black !important;
+      }
+      #print-header h1 { font-size: 18pt; margin-bottom: 2pt; }
+      #print-header p  { font-size: 10pt; color: #444 !important; }
+
+      .card {
+        border: 1pt solid #ccc !important;
+        border-radius: 0 !important;
+        padding: 10pt 12pt;
+        margin-bottom: 14pt;
+        page-break-inside: avoid;
+      }
+
+      .card h2 {
+        font-size: 11pt;
+        letter-spacing: 0.5px;
+        color: black !important;
+        border-bottom: 1pt solid #999 !important;
+        margin-bottom: 8pt;
+        padding-bottom: 4pt;
+        text-transform: uppercase;
+      }
+
+      #sec-financials { page-break-before: always; }
+
+      textarea, input[type="text"], input[type="text"].cell-input, .fin-field input {
+        border: none !important;
+        background: white !important;
+        padding: 0 !important;
+        resize: none;
+        width: 100%;
+        color: black !important;
+        font-size: 9.5pt;
+      }
+
+      table { width: 100%; border-collapse: collapse; }
+      thead th {
+        background: #f0f0f0 !important;
+        color: #333 !important;
+        font-size: 8pt;
+        padding: 4pt 5pt;
+        border: 0.5pt solid #aaa !important;
+      }
+      td {
+        border: 0.5pt solid #ccc !important;
+        padding: 4pt 5pt;
+        font-size: 9pt;
+        vertical-align: top;
+      }
+
+      /* Traffic light dots in print */
+      .tl-dot {
+        font-size: 11pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .tl-dot.red   { color: #cc2244 !important; }
+      .tl-dot.amber { color: #d4720a !important; }
+      .tl-dot.green { color: #2a8a55 !important; }
+
+      select.tl-select, select.trend-select, select.cat-select { display: none !important; }
+
+      /* Trend value shown as text via data attr */
+      .trend-print, .cat-print { display: inline !important; font-size: 9pt; }
+
+      #financials-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8pt;
+      }
+      .fin-field label {
+        font-size: 7.5pt;
+        color: #555 !important;
+        margin-bottom: 2pt;
+      }
+
+      .ask-item { margin-bottom: 5pt; }
+      .cat-chip {
+        background: #eee !important;
+        color: #333 !important;
+        border: 0.5pt solid #aaa !important;
+        font-size: 7pt;
+      }
+
+      .empty-state { display: none !important; }
+
+      tr.tl-red-row, tr.tl-amber-row, tr.tl-green-row { border-left: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <h3>History</h3>
+  <div id="history-list"></div>
+  <button id="btn-new-sidebar">+ New Update</button>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- PRINT HEADER -->
+  <div id="print-header">
+    <h1 id="ph-company"></h1>
+    <p id="ph-date"></p>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div id="toolbar" class="no-print">
+    <input type="text" id="company-name" placeholder="Company Name" autocomplete="off">
+    <select id="month-select">
+      <option value="1">January</option><option value="2">February</option>
+      <option value="3">March</option><option value="4">April</option>
+      <option value="5">May</option><option value="6">June</option>
+      <option value="7">July</option><option value="8">August</option>
+      <option value="9">September</option><option value="10">October</option>
+      <option value="11">November</option><option value="12">December</option>
+    </select>
+    <select id="year-select"></select>
+    <span id="dirty-indicator" title="Unsaved changes">&#9679;</span>
+    <button class="toolbar-btn" id="btn-save">Save</button>
+    <button class="toolbar-btn" id="btn-print">Export PDF</button>
+  </div>
+
+  <!-- SECTION 1: Executive Summary -->
+  <section id="sec-summary" class="card">
+    <h2>Executive Summary</h2>
+    <textarea id="exec-summary" placeholder="Provide a high-level overview of this month — key wins, challenges, and overall narrative for investors..."></textarea>
+  </section>
+
+  <!-- SECTION 2: Key Metrics / KPIs -->
+  <section id="sec-metrics" class="card">
+    <h2>Key Metrics &amp; KPIs</h2>
+    <table id="metrics-table">
+      <thead>
+        <tr>
+          <th style="width:26%">Metric</th>
+          <th style="width:18%">Value</th>
+          <th style="width:18%">vs Last Month</th>
+          <th style="width:14%">Trend</th>
+          <th class="no-print" style="width:5%"></th>
+        </tr>
+      </thead>
+      <tbody id="metrics-body"></tbody>
+    </table>
+    <button class="add-row-btn no-print" id="add-metric">+ Add Metric</button>
+  </section>
+
+  <!-- SECTION 3: Business Health Dashboard -->
+  <section id="sec-health" class="card">
+    <h2>Business Health Dashboard</h2>
+    <table id="health-table">
+      <thead>
+        <tr>
+          <th style="width:18%">Driver / Issue</th>
+          <th style="width:10%">Status</th>
+          <th style="width:22%">Context</th>
+          <th style="width:22%">Financial Impact</th>
+          <th style="width:22%">Mitigation &amp; Timeframe</th>
+          <th class="no-print" style="width:5%"></th>
+        </tr>
+      </thead>
+      <tbody id="health-body"></tbody>
+    </table>
+    <button class="add-row-btn no-print" id="add-health">+ Add Driver</button>
+  </section>
+
+  <!-- SECTION 4: Financials -->
+  <section id="sec-financials" class="card">
+    <h2>Financials</h2>
+    <div id="financials-grid">
+      <div class="fin-field"><label>Revenue</label><input type="text" id="fin-revenue" placeholder="e.g. $120,000"></div>
+      <div class="fin-field"><label>Expenses</label><input type="text" id="fin-expenses" placeholder="e.g. $95,000"></div>
+      <div class="fin-field"><label>Net Profit / Loss</label><input type="text" id="fin-net" placeholder="e.g. +$25,000"></div>
+      <div class="fin-field"><label>Cash Position</label><input type="text" id="fin-cash" placeholder="e.g. $480,000"></div>
+      <div class="fin-field"><label>Runway (months)</label><input type="text" id="fin-runway" placeholder="e.g. 14"></div>
+      <div class="fin-field"><label>Burn Rate</label><input type="text" id="fin-burn" placeholder="e.g. $34,000/mo"></div>
+    </div>
+    <label id="financial-notes-label">Notes</label>
+    <textarea id="financial-notes" rows="4" placeholder="Additional financial context, commentary, or forward-looking statements..."></textarea>
+  </section>
+
+  <!-- SECTION 5: Asks & Needs -->
+  <section id="sec-asks" class="card">
+    <h2>Asks &amp; Needs</h2>
+    <div id="asks-list"></div>
+    <button class="add-row-btn no-print" id="add-ask">+ Add Ask</button>
+  </section>
+
+</main>
+
+<script>
+  // ── CONSTANTS ──
+  const IDX_KEY      = 'investor-update-index';
+  const CO_KEY       = 'investor-update-last-company';
+  const UPDATE_KEY   = m => `investor-update-${m}`;
+  const MONTHS       = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+
+  // ── STATE ──
+  let currentUpdate = null;
+  let isDirty       = false;
+
+  // ── UTILS ──
+  function generateId() { return crypto.randomUUID().slice(0, 8); }
+
+  function formatMonthLabel(ym) {
+    const [y, m] = ym.split('-');
+    return `${MONTHS[parseInt(m, 10) - 1]} ${y}`;
+  }
+
+  function currentYearMonth() {
+    const m = document.getElementById('month-select').value.padStart(2, '0');
+    const y = document.getElementById('year-select').value;
+    return `${y}-${m}`;
+  }
+
+  function debounce(fn, ms) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+
+  function markDirty() {
+    isDirty = true;
+    document.getElementById('dirty-indicator').classList.add('visible');
+  }
+
+  function markClean() {
+    isDirty = false;
+    document.getElementById('dirty-indicator').classList.remove('visible');
+  }
+
+  // ── DEFAULT UPDATE ──
+  function getDefaultUpdate(ym) {
+    return {
+      companyName: localStorage.getItem(CO_KEY) || '',
+      month: ym,
+      executiveSummary: '',
+      metrics: [],
+      health: [],
+      financials: { revenue:'', expenses:'', netProfitLoss:'', cashPosition:'', runway:'', burnRate:'', notes:'' },
+      asks: []
+    };
+  }
+
+  // ── SAVE / LOAD ──
+  function saveUpdate() {
+    if (!currentUpdate) return;
+    currentUpdate.companyName = document.getElementById('company-name').value;
+    localStorage.setItem(UPDATE_KEY(currentUpdate.month), JSON.stringify(currentUpdate));
+    if (currentUpdate.companyName) localStorage.setItem(CO_KEY, currentUpdate.companyName);
+    // update index
+    let idx = getIndex();
+    if (!idx.includes(currentUpdate.month)) idx.push(currentUpdate.month);
+    idx.sort((a, b) => b.localeCompare(a));
+    localStorage.setItem(IDX_KEY, JSON.stringify(idx));
+    markClean();
+    renderSidebar();
+  }
+
+  function getIndex() {
+    try { return JSON.parse(localStorage.getItem(IDX_KEY)) || []; } catch { return []; }
+  }
+
+  function loadUpdate(ym) {
+    const raw = localStorage.getItem(UPDATE_KEY(ym));
+    if (raw) {
+      try { currentUpdate = JSON.parse(raw); } catch { currentUpdate = getDefaultUpdate(ym); }
+    } else {
+      currentUpdate = getDefaultUpdate(ym);
+    }
+    currentUpdate.month = ym;
+    // sync selectors
+    const [y, m] = ym.split('-');
+    document.getElementById('year-select').value  = y;
+    document.getElementById('month-select').value = parseInt(m, 10).toString();
+    markClean();
+    renderAll();
+  }
+
+  // ── RENDER ──
+  function renderAll() {
+    renderSummary();
+    renderMetrics();
+    renderHealth();
+    renderFinancials();
+    renderAsks();
+    renderSidebar();
+    renderPrintHeader();
+    // sync company name
+    document.getElementById('company-name').value = currentUpdate.companyName || '';
+  }
+
+  function renderPrintHeader() {
+    const co = currentUpdate.companyName || 'Company';
+    document.getElementById('ph-company').textContent = co;
+    document.getElementById('ph-date').textContent =
+      formatMonthLabel(currentUpdate.month) + ' — Investor Update';
+    document.title = `${co} — Investor Update ${formatMonthLabel(currentUpdate.month)}`;
+  }
+
+  function renderSummary() {
+    document.getElementById('exec-summary').value = currentUpdate.executiveSummary || '';
+  }
+
+  function renderMetrics() {
+    const tbody = document.getElementById('metrics-body');
+    if (!currentUpdate.metrics.length) {
+      tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No metrics added yet — click + Add Metric to begin</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = currentUpdate.metrics.map(m => {
+      const trendClass = m.trend === 'up' ? 'up' : m.trend === 'down' ? 'down' : 'flat';
+      const trendLabel = m.trend === 'up' ? '↑ Up' : m.trend === 'down' ? '↓ Down' : '→ Flat';
+      return `
+        <tr>
+          <td><input type="text" class="cell-input" data-id="${m.id}" data-field="name" value="${esc(m.name)}" placeholder="Metric name"></td>
+          <td><input type="text" class="cell-input" data-id="${m.id}" data-field="value" value="${esc(m.value)}" placeholder="Value"></td>
+          <td><input type="text" class="cell-input" data-id="${m.id}" data-field="vsLastMonth" value="${esc(m.vsLastMonth)}" placeholder="+/- %"></td>
+          <td>
+            <select class="trend-select ${trendClass}" data-id="${m.id}" data-field="trend">
+              <option value="up"   ${m.trend==='up'  ?'selected':''}>↑ Up</option>
+              <option value="flat" ${m.trend==='flat'?'selected':''}>→ Flat</option>
+              <option value="down" ${m.trend==='down'?'selected':''}>↓ Down</option>
+            </select>
+            <span class="trend-print" style="display:none">${trendLabel}</span>
+          </td>
+          <td class="no-print"><button class="btn-del" data-action="del-metric" data-id="${m.id}" title="Remove">&#10005;</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function renderHealth() {
+    const tbody = document.getElementById('health-body');
+    if (!currentUpdate.health.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No drivers added yet — click + Add Driver to begin</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = currentUpdate.health.map(h => {
+      const dotClass = h.status || 'amber';
+      const dotChar  = '&#9679;';
+      return `
+        <tr class="tl-${dotClass}-row">
+          <td><input type="text" class="cell-input" data-id="${h.id}" data-field="driver" value="${esc(h.driver)}" placeholder="Driver / issue"></td>
+          <td>
+            <div class="tl-cell">
+              <span class="tl-dot ${dotClass}" data-id="${h.id}">${dotChar}</span>
+              <select class="tl-select no-print" data-id="${h.id}" data-field="status">
+                <option value="green" ${h.status==='green'?'selected':''}>Green</option>
+                <option value="amber" ${h.status==='amber'?'selected':''}>Amber</option>
+                <option value="red"   ${h.status==='red'  ?'selected':''}>Red</option>
+              </select>
+            </div>
+          </td>
+          <td><input type="text" class="cell-input" data-id="${h.id}" data-field="context" value="${esc(h.context)}" placeholder="Brief context"></td>
+          <td><input type="text" class="cell-input" data-id="${h.id}" data-field="financialImpact" value="${esc(h.financialImpact)}" placeholder="e.g. -$10k ARR"></td>
+          <td><input type="text" class="cell-input" data-id="${h.id}" data-field="mitigation" value="${esc(h.mitigation)}" placeholder="Mitigation &amp; timeframe"></td>
+          <td class="no-print"><button class="btn-del" data-action="del-health" data-id="${h.id}" title="Remove">&#10005;</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function renderFinancials() {
+    const f = currentUpdate.financials;
+    document.getElementById('fin-revenue').value  = f.revenue || '';
+    document.getElementById('fin-expenses').value = f.expenses || '';
+    document.getElementById('fin-net').value      = f.netProfitLoss || '';
+    document.getElementById('fin-cash').value     = f.cashPosition || '';
+    document.getElementById('fin-runway').value   = f.runway || '';
+    document.getElementById('fin-burn').value     = f.burnRate || '';
+    document.getElementById('financial-notes').value = f.notes || '';
+  }
+
+  function renderAsks() {
+    const list = document.getElementById('asks-list');
+    if (!currentUpdate.asks.length) {
+      list.innerHTML = `<p class="empty-state">No asks added yet — click + Add Ask to begin</p>`;
+      return;
+    }
+    list.innerHTML = currentUpdate.asks.map(a => `
+      <div class="ask-item">
+        <span class="cat-chip cat-${a.category}">${a.category}</span>
+        <input type="text" value="${esc(a.text)}" data-id="${a.id}" data-field="text" placeholder="Describe your ask or need..." style="flex:1;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:0.5rem 0.8rem;font-size:0.9rem;">
+        <select class="cat-select no-print" data-id="${a.id}" data-field="category">
+          <option value="Intro"    ${a.category==='Intro'   ?'selected':''}>Intro</option>
+          <option value="Advice"   ${a.category==='Advice'  ?'selected':''}>Advice</option>
+          <option value="Resource" ${a.category==='Resource'?'selected':''}>Resource</option>
+          <option value="Other"    ${a.category==='Other'   ?'selected':''}>Other</option>
+        </select>
+        <button class="btn-del no-print" data-action="del-ask" data-id="${a.id}" title="Remove">&#10005;</button>
+      </div>`).join('');
+  }
+
+  function renderSidebar() {
+    const list = document.getElementById('history-list');
+    const idx  = getIndex();
+    if (!idx.length) {
+      list.innerHTML = '<p id="sidebar-empty">No saved updates yet</p>';
+      return;
+    }
+    list.innerHTML = idx.map(ym => {
+      const active = currentUpdate && currentUpdate.month === ym ? ' active' : '';
+      return `<button class="sidebar-month-btn${active}" data-ym="${ym}">${formatMonthLabel(ym)}</button>`;
+    }).join('');
+  }
+
+  // ── ESCAPE ──
+  function esc(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── EVENT DELEGATION ──
+
+  // Main content inputs
+  document.getElementById('main').addEventListener('input', debounce(() => saveUpdate(), 2000));
+  document.getElementById('main').addEventListener('change', debounce(() => saveUpdate(), 2000));
+  document.getElementById('main').addEventListener('input', () => markDirty());
+  document.getElementById('main').addEventListener('change', () => markDirty());
+
+  // Specific field handlers
+  document.getElementById('exec-summary').addEventListener('input', e => {
+    currentUpdate.executiveSummary = e.target.value;
+  });
+
+  document.getElementById('company-name').addEventListener('input', e => {
+    currentUpdate.companyName = e.target.value;
+    renderPrintHeader();
+    markDirty();
+  });
+
+  // Delegate table inputs
+  document.getElementById('metrics-body').addEventListener('input', e => {
+    const el = e.target;
+    if (!el.dataset.id) return;
+    const row = currentUpdate.metrics.find(m => m.id === el.dataset.id);
+    if (row) { row[el.dataset.field] = el.value; markDirty(); }
+  });
+
+  document.getElementById('metrics-body').addEventListener('change', e => {
+    const el = e.target;
+    if (!el.dataset.id) return;
+    const row = currentUpdate.metrics.find(m => m.id === el.dataset.id);
+    if (row) {
+      row[el.dataset.field] = el.value;
+      if (el.dataset.field === 'trend') {
+        el.className = `trend-select ${el.value}`;
+      }
+      markDirty();
+    }
+  });
+
+  document.getElementById('health-body').addEventListener('input', e => {
+    const el = e.target;
+    if (!el.dataset.id) return;
+    const row = currentUpdate.health.find(h => h.id === el.dataset.id);
+    if (row) { row[el.dataset.field] = el.value; markDirty(); }
+  });
+
+  document.getElementById('health-body').addEventListener('change', e => {
+    const el = e.target;
+    if (!el.dataset.id) return;
+    const row = currentUpdate.health.find(h => h.id === el.dataset.id);
+    if (row) {
+      row[el.dataset.field] = el.value;
+      if (el.dataset.field === 'status') {
+        // update dot
+        const dot = document.querySelector(`.tl-dot[data-id="${el.dataset.id}"]`);
+        if (dot) { dot.className = `tl-dot ${el.value}`; }
+        // update row stripe
+        const tr = el.closest('tr');
+        if (tr) { tr.className = `tl-${el.value}-row`; }
+      }
+      markDirty();
+    }
+  });
+
+  // Financials
+  ['fin-revenue','fin-expenses','fin-net','fin-cash','fin-runway','fin-burn'].forEach(id => {
+    const fieldMap = {
+      'fin-revenue':'revenue','fin-expenses':'expenses','fin-net':'netProfitLoss',
+      'fin-cash':'cashPosition','fin-runway':'runway','fin-burn':'burnRate'
+    };
+    document.getElementById(id).addEventListener('input', e => {
+      currentUpdate.financials[fieldMap[id]] = e.target.value; markDirty();
+    });
+  });
+  document.getElementById('financial-notes').addEventListener('input', e => {
+    currentUpdate.financials.notes = e.target.value; markDirty();
+  });
+
+  // Asks
+  document.getElementById('asks-list').addEventListener('input', e => {
+    const el = e.target;
+    if (!el.dataset.id) return;
+    const row = currentUpdate.asks.find(a => a.id === el.dataset.id);
+    if (row) { row[el.dataset.field] = el.value; markDirty(); }
+  });
+
+  document.getElementById('asks-list').addEventListener('change', e => {
+    const el = e.target;
+    if (!el.dataset.id) return;
+    const row = currentUpdate.asks.find(a => a.id === el.dataset.id);
+    if (row) {
+      row[el.dataset.field] = el.value;
+      if (el.dataset.field === 'category') renderAsks();
+      markDirty();
+    }
+  });
+
+  // Delete buttons (delegated to main)
+  document.getElementById('main').addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const { action, id } = btn.dataset;
+
+    if (action === 'del-metric') {
+      if (!confirm('Remove this metric?')) return;
+      currentUpdate.metrics = currentUpdate.metrics.filter(m => m.id !== id);
+      renderMetrics(); markDirty();
+    }
+    if (action === 'del-health') {
+      if (!confirm('Remove this driver?')) return;
+      currentUpdate.health = currentUpdate.health.filter(h => h.id !== id);
+      renderHealth(); markDirty();
+    }
+    if (action === 'del-ask') {
+      if (!confirm('Remove this ask?')) return;
+      currentUpdate.asks = currentUpdate.asks.filter(a => a.id !== id);
+      renderAsks(); markDirty();
+    }
+  });
+
+  // Add row buttons
+  document.getElementById('add-metric').addEventListener('click', () => {
+    currentUpdate.metrics.push({ id: generateId(), name:'', value:'', vsLastMonth:'', trend:'flat' });
+    renderMetrics(); markDirty();
+  });
+
+  document.getElementById('add-health').addEventListener('click', () => {
+    currentUpdate.health.push({ id: generateId(), driver:'', status:'green', context:'', financialImpact:'', mitigation:'' });
+    renderHealth(); markDirty();
+  });
+
+  document.getElementById('add-ask').addEventListener('click', () => {
+    currentUpdate.asks.push({ id: generateId(), text:'', category:'Intro' });
+    renderAsks(); markDirty();
+  });
+
+  // Toolbar buttons
+  document.getElementById('btn-save').addEventListener('click', () => saveUpdate());
+
+  document.getElementById('btn-print').addEventListener('click', () => {
+    renderPrintHeader();
+    saveUpdate();
+    window.print();
+  });
+
+  document.getElementById('btn-new-sidebar').addEventListener('click', () => {
+    if (isDirty && !confirm('You have unsaved changes. Save before starting a new update?')) return;
+    if (isDirty) saveUpdate();
+    const now = new Date();
+    const ym  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    document.getElementById('year-select').value  = now.getFullYear();
+    document.getElementById('month-select').value = now.getMonth() + 1;
+    currentUpdate = getDefaultUpdate(ym);
+    currentUpdate.companyName = localStorage.getItem(CO_KEY) || '';
+    markClean();
+    renderAll();
+  });
+
+  // Month / year selectors
+  function onMonthYearChange() {
+    const ym = currentYearMonth();
+    if (currentUpdate && currentUpdate.month === ym) return;
+    if (isDirty && !confirm('You have unsaved changes. Save before switching month?')) {
+      // revert selector
+      const [cy, cm] = currentUpdate.month.split('-');
+      document.getElementById('year-select').value  = cy;
+      document.getElementById('month-select').value = parseInt(cm, 10);
+      return;
+    }
+    if (isDirty) saveUpdate();
+    loadUpdate(ym);
+  }
+  document.getElementById('month-select').addEventListener('change', onMonthYearChange);
+  document.getElementById('year-select').addEventListener('change', onMonthYearChange);
+
+  // Sidebar history
+  document.getElementById('history-list').addEventListener('click', e => {
+    const btn = e.target.closest('.sidebar-month-btn');
+    if (!btn) return;
+    const ym = btn.dataset.ym;
+    if (currentUpdate && currentUpdate.month === ym) return;
+    if (isDirty && !confirm('You have unsaved changes. Save before switching?')) return;
+    if (isDirty) saveUpdate();
+    loadUpdate(ym);
+  });
+
+  // Ctrl+S
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveUpdate(); }
+  });
+
+  // ── INIT ──
+  (function init() {
+    // Populate year selector
+    const now = new Date();
+    const thisYear = now.getFullYear();
+    const yearSel  = document.getElementById('year-select');
+    for (let y = thisYear + 1; y >= thisYear - 3; y--) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      if (y === thisYear) opt.selected = true;
+      yearSel.appendChild(opt);
+    }
+    document.getElementById('month-select').value = now.getMonth() + 1;
+
+    // Load most recent or current month
+    const idx = getIndex();
+    const ym  = idx.length ? idx[0] :
+      `${thisYear}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    loadUpdate(ym);
+  })();
+</script>
+</body>
+</html>
