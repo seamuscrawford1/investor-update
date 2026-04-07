@@ -481,6 +481,33 @@
     /* ── PERIOD IN REVIEW ── */
     .pir-risk-cell { display: flex; align-items: center; gap: 0.4rem; }
 
+    /* ── XERO IMPORT ── */
+    #xero-import-panel {
+      margin-bottom: 1.2rem;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+    }
+    .xero-toggle-btn {
+      background: none; border: none; color: var(--muted);
+      font-size: 0.82rem; cursor: pointer; padding: 0;
+      letter-spacing: 0.5px; font-family: inherit;
+    }
+    .xero-toggle-btn:hover { color: var(--blue); }
+    .xero-hint { font-size: 0.78rem; color: var(--muted); margin: 0.5rem 0 0.6rem; }
+    #xero-json-input {
+      min-height: 90px; font-family: 'Courier New', monospace;
+      font-size: 0.78rem; resize: vertical;
+    }
+    #btn-apply-xero {
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: 0.4rem 1rem;
+      font-size: 0.85rem; cursor: pointer; font-family: inherit;
+      transition: background 0.15s;
+    }
+    #btn-apply-xero:hover { background: #1a3a6e; }
+    #xero-import-status { font-size: 0.82rem; color: var(--tl-green); align-self: center; }
+
     /* ── FORWARD LOOK ── */
     .forward-look-grid {
       display: grid;
@@ -733,6 +760,19 @@
   <!-- SECTION 4: Financials -->
   <section id="sec-financials" class="card">
     <h2>Financials</h2>
+
+    <!-- Xero Import (no-print) -->
+    <div id="xero-import-panel" class="no-print">
+      <button id="btn-toggle-xero" class="xero-toggle-btn">&#8595; Import from Xero</button>
+      <div id="xero-import-body" style="display:none">
+        <p class="xero-hint">Share your Xero CSV file paths in the terminal — Claude will read them and generate JSON to paste here.</p>
+        <textarea id="xero-json-input" placeholder='{"revenue":"$120,000","cogs":"$40,000","opex":[...],"netProfitLoss":"-$25,000","cashPosition":"$480,000","burnRate":"$34,000/mo","runway":"14"}'></textarea>
+        <div style="display:flex;gap:0.6rem;margin-top:0.6rem;align-items:center">
+          <button id="btn-apply-xero">Apply to Financials</button>
+          <span id="xero-import-status"></span>
+        </div>
+      </div>
+    </div>
 
     <!-- Revenue & Gross Margin -->
     <div class="fin-sub-header">Revenue &amp; Gross Margin</div>
@@ -1453,6 +1493,52 @@
   document.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveUpdate(); }
   });
+
+  // ── XERO IMPORT ──
+  function applyXeroImport() {
+    const raw    = document.getElementById('xero-json-input').value.trim();
+    const status = document.getElementById('xero-import-status');
+    try {
+      const data = JSON.parse(raw);
+      const f    = currentUpdate.financials;
+      if (data.revenue       !== undefined) f.revenue       = data.revenue;
+      if (data.cogs          !== undefined) f.cogs          = data.cogs;
+      if (data.netProfitLoss !== undefined) f.netProfitLoss = data.netProfitLoss;
+      if (data.cashPosition  !== undefined) f.cashPosition  = data.cashPosition;
+      if (data.runway        !== undefined) f.runway        = data.runway;
+      if (data.burnRate      !== undefined) f.burnRate      = data.burnRate;
+      if (data.notes         !== undefined) f.notes         = data.notes;
+      // Smart-merge opex: update existing presets by id, append new rows
+      if (Array.isArray(data.opex)) {
+        data.opex.forEach(incoming => {
+          const existing = f.opex.find(r => r.id === incoming.id);
+          if (existing) {
+            existing.amount = incoming.amount;
+          } else {
+            f.opex.push({ ...incoming, preset: false });
+          }
+        });
+      }
+      renderFinancials();
+      markDirty();
+      status.style.color = 'var(--tl-green)';
+      status.textContent = '✓ Applied successfully';
+      setTimeout(() => { status.textContent = ''; }, 3000);
+    } catch(e) {
+      status.style.color = 'var(--tl-red)';
+      status.textContent = '✗ Invalid JSON — check the format and try again';
+    }
+  }
+
+  document.getElementById('btn-toggle-xero').addEventListener('click', () => {
+    const body = document.getElementById('xero-import-body');
+    const btn  = document.getElementById('btn-toggle-xero');
+    const open = body.style.display === 'none';
+    body.style.display = open ? 'block' : 'none';
+    btn.innerHTML = open ? '&#8593; Import from Xero' : '&#8595; Import from Xero';
+  });
+
+  document.getElementById('btn-apply-xero').addEventListener('click', applyXeroImport);
 
   // ── DOCX PARSER ──
   // Reads word/document.xml from a .docx (ZIP) file using browser-native APIs only
