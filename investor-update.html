@@ -382,6 +382,102 @@
     .cat-Resource { background: #0a3a1e; color: var(--tl-green); }
     .cat-Other    { background: #2a2a4a; color: var(--muted); }
 
+    /* ── FINANCIALS ENHANCED ── */
+    .fin-sub-header {
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin: 1.2rem 0 0.7rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .fin-sub-header:first-child { margin-top: 0; }
+
+    .fin-top-grid, .fin-bottom-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .fin-bottom-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .fin-field.fin-calculated .fin-calc-value {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--blue);
+      padding: 0.55rem 0.8rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      min-height: 2.3rem;
+    }
+
+    #opex-table thead th { padding: 0.5rem 0.6rem; }
+    #opex-table td { padding: 0.4rem 0.4rem; }
+    .opex-total-row td {
+      padding: 0.6rem 0.6rem;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+    }
+    .opex-total-row td:first-child { font-size: 0.85rem; }
+
+    /* ── WORD IMPORT ── */
+    #word-import-panel {
+      margin-top: 0.8rem;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      line-height: 1.55;
+    }
+    #word-import-panel.has-content { color: var(--text); }
+
+    .import-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .import-toolbar label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .import-toolbar label:hover { background: #1a3a6e; }
+    #docx-file-input { display: none; }
+
+    .import-toolbar .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .import-toolbar .copy-btn:hover { color: var(--blue); border-color: var(--blue); }
+
+    #docx-status {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
     /* ── PRINT HEADER ── */
     #print-header { display: none; }
 
@@ -473,16 +569,17 @@
       /* Trend value shown as text via data attr */
       .trend-print, .cat-print { display: inline !important; font-size: 9pt; }
 
-      #financials-grid {
+      .fin-top-grid, .fin-bottom-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
         gap: 8pt;
       }
-      .fin-field label {
-        font-size: 7.5pt;
-        color: #555 !important;
-        margin-bottom: 2pt;
-      }
+      .fin-top-grid    { grid-template-columns: repeat(4, 1fr); }
+      .fin-bottom-grid { grid-template-columns: repeat(3, 1fr); }
+      .fin-sub-header  { font-size: 8pt; color: #444 !important; margin: 8pt 0 4pt; border-bottom: 0.5pt solid #ccc !important; }
+      .fin-field label { font-size: 7.5pt; color: #555 !important; margin-bottom: 2pt; }
+      .fin-calc-value  { font-size: 9pt; font-weight: bold; padding: 0 !important; border: none !important; background: white !important; color: black !important; }
+      #opex-table tfoot td { border-top: 1pt solid #aaa !important; font-size: 9pt; }
+      #sec-word-import { display: none !important; }
 
       .ask-item { margin-bottom: 5pt; }
       .cat-chip {
@@ -533,6 +630,22 @@
     <button class="toolbar-btn" id="btn-print">Export PDF</button>
   </div>
 
+  <!-- WORD IMPORT (no-print) -->
+  <section id="sec-word-import" class="card no-print">
+    <h2>Previous Report Reference</h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.8rem;">
+      Upload a previous Word report to use as reference when drafting this month's update with AI assistance in the terminal.
+    </p>
+    <div class="import-toolbar">
+      <label for="docx-file-input">&#128196; Upload .docx</label>
+      <input type="file" id="docx-file-input" accept=".docx">
+      <button class="copy-btn" id="btn-copy-docx" style="display:none">&#128203; Copy text</button>
+      <button class="copy-btn" id="btn-clear-docx" style="display:none">&#10005; Clear</button>
+      <span id="docx-status">No file loaded</span>
+    </div>
+    <div id="word-import-panel">Upload a .docx file to see extracted text here — then copy it into the terminal as context for AI drafting.</div>
+  </section>
+
   <!-- SECTION 1: Executive Summary -->
   <section id="sec-summary" class="card">
     <h2>Executive Summary</h2>
@@ -579,15 +692,48 @@
   <!-- SECTION 4: Financials -->
   <section id="sec-financials" class="card">
     <h2>Financials</h2>
-    <div id="financials-grid">
+
+    <!-- Revenue & Gross Margin -->
+    <div class="fin-sub-header">Revenue &amp; Gross Margin</div>
+    <div class="fin-top-grid">
       <div class="fin-field"><label>Revenue</label><input type="text" id="fin-revenue" placeholder="e.g. $120,000"></div>
-      <div class="fin-field"><label>Expenses</label><input type="text" id="fin-expenses" placeholder="e.g. $95,000"></div>
+      <div class="fin-field"><label>Cost of Goods Sold (COGS)</label><input type="text" id="fin-cogs" placeholder="e.g. $40,000"></div>
+      <div class="fin-field fin-calculated"><label>Gross Profit</label><div class="fin-calc-value" id="fin-gross-profit">—</div></div>
+      <div class="fin-field fin-calculated"><label>Gross Margin %</label><div class="fin-calc-value" id="fin-gross-margin">—</div></div>
+    </div>
+
+    <!-- Operating Costs -->
+    <div class="fin-sub-header">Operating Costs</div>
+    <table id="opex-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th style="width:200px">Amount</th>
+          <th class="no-print" style="width:42px"></th>
+        </tr>
+      </thead>
+      <tbody id="opex-body"></tbody>
+      <tfoot>
+        <tr class="opex-total-row">
+          <td>Total Operating Costs</td>
+          <td id="fin-total-opex">—</td>
+          <td class="no-print"></td>
+        </tr>
+      </tfoot>
+    </table>
+    <button class="add-row-btn no-print" id="add-opex">+ Add Cost Category</button>
+
+    <!-- Bottom Line -->
+    <div class="fin-sub-header">Bottom Line</div>
+    <div class="fin-bottom-grid">
+      <div class="fin-field fin-calculated"><label>Operating Profit / Loss</label><div class="fin-calc-value" id="fin-op-profit">—</div></div>
       <div class="fin-field"><label>Net Profit / Loss</label><input type="text" id="fin-net" placeholder="e.g. +$25,000"></div>
       <div class="fin-field"><label>Cash Position</label><input type="text" id="fin-cash" placeholder="e.g. $480,000"></div>
       <div class="fin-field"><label>Runway (months)</label><input type="text" id="fin-runway" placeholder="e.g. 14"></div>
-      <div class="fin-field"><label>Burn Rate</label><input type="text" id="fin-burn" placeholder="e.g. $34,000/mo"></div>
+      <div class="fin-field"><label>Burn Rate / Month</label><input type="text" id="fin-burn" placeholder="e.g. $34,000/mo"></div>
     </div>
-    <label id="financial-notes-label">Notes</label>
+
+    <label id="financial-notes-label" style="display:block;margin-top:1rem;">Notes</label>
     <textarea id="financial-notes" rows="4" placeholder="Additional financial context, commentary, or forward-looking statements..."></textarea>
   </section>
 
@@ -642,6 +788,14 @@
   }
 
   // ── DEFAULT UPDATE ──
+  function defaultOpex() {
+    return [
+      { id: 'preset-sal', label: 'Salaries & Payroll',  amount: '', preset: true },
+      { id: 'preset-mkt', label: 'Sales & Marketing',   amount: '', preset: true },
+      { id: 'preset-ga',  label: 'General & Admin (G&A)',amount: '', preset: true },
+    ];
+  }
+
   function getDefaultUpdate(ym) {
     return {
       companyName: localStorage.getItem(CO_KEY) || '',
@@ -649,9 +803,52 @@
       executiveSummary: '',
       metrics: [],
       health: [],
-      financials: { revenue:'', expenses:'', netProfitLoss:'', cashPosition:'', runway:'', burnRate:'', notes:'' },
+      financials: {
+        revenue:'', cogs:'',
+        opex: defaultOpex(),
+        netProfitLoss:'', cashPosition:'', runway:'', burnRate:'', notes:''
+      },
       asks: []
     };
+  }
+
+  // ── FINANCIAL CALCULATIONS ──
+  function parseAmt(str) {
+    if (!str) return NaN;
+    const n = parseFloat(str.replace(/[$,£€\s]/g, '').replace(/\((.+)\)/, '-$1'));
+    return isNaN(n) ? NaN : n;
+  }
+
+  function fmtAmt(n) {
+    if (isNaN(n)) return '—';
+    const abs = Math.abs(n);
+    const formatted = abs >= 1000
+      ? '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      : '$' + abs.toFixed(0);
+    return n < 0 ? '-' + formatted : formatted;
+  }
+
+  function recalcFinancials() {
+    const f = currentUpdate.financials;
+    const rev  = parseAmt(f.revenue);
+    const cogs = parseAmt(f.cogs);
+    const grossProfit  = (!isNaN(rev) && !isNaN(cogs)) ? rev - cogs : NaN;
+    const grossMargin  = (!isNaN(grossProfit) && !isNaN(rev) && rev !== 0)
+                         ? (grossProfit / rev * 100) : NaN;
+    const opexAmounts  = f.opex.map(r => parseAmt(r.amount)).filter(v => !isNaN(v));
+    const totalOpex    = opexAmounts.length ? opexAmounts.reduce((a,b) => a+b, 0) : NaN;
+    const opProfit     = (!isNaN(grossProfit) && !isNaN(totalOpex)) ? grossProfit - totalOpex : NaN;
+
+    document.getElementById('fin-gross-profit').textContent = fmtAmt(grossProfit);
+    document.getElementById('fin-gross-margin').textContent = isNaN(grossMargin) ? '—' : grossMargin.toFixed(1) + '%';
+    document.getElementById('fin-total-opex').textContent   = fmtAmt(totalOpex);
+    document.getElementById('fin-op-profit').textContent    = fmtAmt(opProfit);
+
+    // colour indicators
+    const opEl = document.getElementById('fin-op-profit');
+    opEl.style.color = isNaN(opProfit) ? '' : opProfit >= 0 ? 'var(--tl-green)' : 'var(--tl-red)';
+    const gpEl = document.getElementById('fin-gross-profit');
+    gpEl.style.color = isNaN(grossProfit) ? '' : grossProfit >= 0 ? 'var(--tl-green)' : 'var(--tl-red)';
   }
 
   // ── SAVE / LOAD ──
@@ -773,13 +970,32 @@
 
   function renderFinancials() {
     const f = currentUpdate.financials;
-    document.getElementById('fin-revenue').value  = f.revenue || '';
-    document.getElementById('fin-expenses').value = f.expenses || '';
-    document.getElementById('fin-net').value      = f.netProfitLoss || '';
-    document.getElementById('fin-cash').value     = f.cashPosition || '';
-    document.getElementById('fin-runway').value   = f.runway || '';
-    document.getElementById('fin-burn').value     = f.burnRate || '';
+    // Migrate old data that had 'expenses' but no opex array
+    if (!f.opex) f.opex = defaultOpex();
+
+    document.getElementById('fin-revenue').value = f.revenue || '';
+    document.getElementById('fin-cogs').value    = f.cogs    || '';
+    document.getElementById('fin-net').value     = f.netProfitLoss || '';
+    document.getElementById('fin-cash').value    = f.cashPosition  || '';
+    document.getElementById('fin-runway').value  = f.runway  || '';
+    document.getElementById('fin-burn').value    = f.burnRate || '';
     document.getElementById('financial-notes').value = f.notes || '';
+
+    // Opex table
+    const tbody = document.getElementById('opex-body');
+    tbody.innerHTML = f.opex.map(row => `
+      <tr>
+        <td>${row.preset
+          ? `<span style="font-size:0.9rem;color:var(--text)">${esc(row.label)}</span>`
+          : `<input type="text" class="cell-input" data-id="${row.id}" data-opex-field="label" value="${esc(row.label)}" placeholder="Category name">`}
+        </td>
+        <td><input type="text" class="cell-input" data-id="${row.id}" data-opex-field="amount" value="${esc(row.amount)}" placeholder="e.g. $25,000"></td>
+        <td class="no-print">${!row.preset
+          ? `<button class="btn-del" data-action="del-opex" data-id="${row.id}" title="Remove">&#10005;</button>`
+          : ''}</td>
+      </tr>`).join('');
+
+    recalcFinancials();
   }
 
   function renderAsks() {
@@ -886,18 +1102,27 @@
     }
   });
 
-  // Financials
-  ['fin-revenue','fin-expenses','fin-net','fin-cash','fin-runway','fin-burn'].forEach(id => {
-    const fieldMap = {
-      'fin-revenue':'revenue','fin-expenses':'expenses','fin-net':'netProfitLoss',
-      'fin-cash':'cashPosition','fin-runway':'runway','fin-burn':'burnRate'
-    };
+  // Financials — top-line fields
+  const finFieldMap = {
+    'fin-revenue':'revenue','fin-cogs':'cogs','fin-net':'netProfitLoss',
+    'fin-cash':'cashPosition','fin-runway':'runway','fin-burn':'burnRate'
+  };
+  ['fin-revenue','fin-cogs','fin-net','fin-cash','fin-runway','fin-burn'].forEach(id => {
     document.getElementById(id).addEventListener('input', e => {
-      currentUpdate.financials[fieldMap[id]] = e.target.value; markDirty();
+      currentUpdate.financials[finFieldMap[id]] = e.target.value;
+      recalcFinancials(); markDirty();
     });
   });
   document.getElementById('financial-notes').addEventListener('input', e => {
     currentUpdate.financials.notes = e.target.value; markDirty();
+  });
+
+  // Financials — opex table
+  document.getElementById('opex-body').addEventListener('input', e => {
+    const el = e.target;
+    if (!el.dataset.id || !el.dataset.opexField) return;
+    const row = currentUpdate.financials.opex.find(r => r.id === el.dataset.id);
+    if (row) { row[el.dataset.opexField] = el.value; recalcFinancials(); markDirty(); }
   });
 
   // Asks
@@ -940,6 +1165,11 @@
       currentUpdate.asks = currentUpdate.asks.filter(a => a.id !== id);
       renderAsks(); markDirty();
     }
+    if (action === 'del-opex') {
+      if (!confirm('Remove this cost category?')) return;
+      currentUpdate.financials.opex = currentUpdate.financials.opex.filter(r => r.id !== id);
+      renderFinancials(); markDirty();
+    }
   });
 
   // Add row buttons
@@ -956,6 +1186,11 @@
   document.getElementById('add-ask').addEventListener('click', () => {
     currentUpdate.asks.push({ id: generateId(), text:'', category:'Intro' });
     renderAsks(); markDirty();
+  });
+
+  document.getElementById('add-opex').addEventListener('click', () => {
+    currentUpdate.financials.opex.push({ id: generateId(), label:'', amount:'', preset: false });
+    renderFinancials(); markDirty();
   });
 
   // Toolbar buttons
@@ -1011,6 +1246,108 @@
   // Ctrl+S
   document.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveUpdate(); }
+  });
+
+  // ── DOCX PARSER ──
+  // Reads word/document.xml from a .docx (ZIP) file using browser-native APIs only
+  async function extractDocxText(file) {
+    const buf   = await file.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+
+    // Walk ZIP local file headers (PK\x03\x04)
+    let offset = 0;
+    while (offset < bytes.length - 30) {
+      if (bytes[offset]===0x50 && bytes[offset+1]===0x4B &&
+          bytes[offset+2]===0x03 && bytes[offset+3]===0x04) {
+        const compression = bytes[offset+8]  | (bytes[offset+9]  << 8);
+        const compSize    = bytes[offset+18] | (bytes[offset+19] << 8) |
+                            (bytes[offset+20] << 16) | (bytes[offset+21] << 24);
+        const fnLen       = bytes[offset+26] | (bytes[offset+27] << 8);
+        const extraLen    = bytes[offset+28] | (bytes[offset+29] << 8);
+        const filename    = new TextDecoder().decode(bytes.slice(offset+30, offset+30+fnLen));
+        const dataStart   = offset + 30 + fnLen + extraLen;
+
+        if (filename === 'word/document.xml') {
+          const compData = bytes.slice(dataStart, dataStart + compSize);
+          let xmlText;
+          if (compression === 0) {
+            xmlText = new TextDecoder('utf-8').decode(compData);
+          } else {
+            const ds     = new DecompressionStream('deflate-raw');
+            const writer = ds.writable.getWriter();
+            writer.write(compData);
+            writer.close();
+            const chunks = [];
+            const reader = ds.readable.getReader();
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+            }
+            const total    = chunks.reduce((s, c) => s + c.length, 0);
+            const combined = new Uint8Array(total);
+            let pos = 0;
+            for (const c of chunks) { combined.set(c, pos); pos += c.length; }
+            xmlText = new TextDecoder('utf-8').decode(combined);
+          }
+          // Convert XML to readable text
+          return xmlText
+            .replace(/<w:p[ />]/g, m => '\n<' + m.slice(1))   // paragraph → newline
+            .replace(/<w:br[^>]*\/>/g, '\n')                   // line break
+            .replace(/<w:tab[^>]*\/>/g, '\t')                  // tab
+            .replace(/<[^>]+>/g, '')                            // strip all tags
+            .replace(/&amp;/g,'&').replace(/&lt;/g,'<')
+            .replace(/&gt;/g,'>').replace(/&quot;/g,'"')
+            .replace(/&#xD;/g,'').replace(/\r/g,'')
+            .replace(/\n{3,}/g, '\n\n').trim();
+        }
+        offset = dataStart + (compSize > 0 ? compSize : 1);
+      } else {
+        offset++;
+      }
+    }
+    return null;
+  }
+
+  // Word import handlers
+  document.getElementById('docx-file-input').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = document.getElementById('docx-status');
+    const panel  = document.getElementById('word-import-panel');
+    status.textContent = 'Reading…';
+    try {
+      const text = await extractDocxText(file);
+      if (!text) throw new Error('word/document.xml not found');
+      panel.textContent = text;
+      panel.classList.add('has-content');
+      status.textContent = file.name;
+      document.getElementById('btn-copy-docx').style.display = '';
+      document.getElementById('btn-clear-docx').style.display = '';
+    } catch (err) {
+      status.textContent = 'Failed to read file. Try saving as .docx (not .doc).';
+      panel.textContent  = '';
+    }
+    e.target.value = ''; // allow re-uploading same file
+  });
+
+  document.getElementById('btn-copy-docx').addEventListener('click', () => {
+    const text = document.getElementById('word-import-panel').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('btn-copy-docx');
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  });
+
+  document.getElementById('btn-clear-docx').addEventListener('click', () => {
+    document.getElementById('word-import-panel').textContent =
+      'Upload a .docx file to see extracted text here — then copy it into the terminal as context for AI drafting.';
+    document.getElementById('word-import-panel').classList.remove('has-content');
+    document.getElementById('docx-status').textContent = 'No file loaded';
+    document.getElementById('btn-copy-docx').style.display = 'none';
+    document.getElementById('btn-clear-docx').style.display = 'none';
   });
 
   // ── INIT ──
