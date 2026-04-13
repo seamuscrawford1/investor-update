@@ -81,6 +81,8 @@ JSON schema Claude generates matches `currentUpdate.financials` exactly, with op
 
 ## Git workflow
 
+**Prompt the user to save to GitHub regularly.** After every completed task, feature, or meaningful change, ask the user if they'd like to commit and push. If multiple changes have been made without a commit, remind the user to save their progress.
+
 After every meaningful piece of work — a new feature, a bug fix, a content/template change — commit and push immediately. Do not batch multiple unrelated changes into one commit.
 
 ```bash

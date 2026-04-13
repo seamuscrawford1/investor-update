@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claro DR — Commercial Options Model</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --border: #dee2e6;
+  --accent: #e94560;
+  --accent2: #ff6b35;
+  --green: #2d6a4f;
+  --green-light: #d8f3dc;
+  --red: #d00000;
+  --red-light: #fde8e8;
+  --amber: #e67700;
+  --amber-light: #fff3cd;
+  --blue: #1971c2;
+  --blue-light: #d0ebff;
+  --text: #212529;
+  --muted: #6c757d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; }
+h1 { font-size: 1.6rem; margin-bottom: 4px; }
+h2 { font-size: 1.2rem; margin: 24px 0 12px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
+h3 { font-size: 1rem; margin: 16px 0 8px; color: var(--blue); }
+.subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.card.highlight { border-color: var(--green); border-width: 2px; background: #f0fdf4; }
+.card.warning { border-color: var(--amber); border-width: 2px; background: #fffbeb; }
+.card.danger { border-color: var(--red); border-width: 2px; background: #fef2f2; }
+.card h3 { margin-top: 0; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-red { background: var(--red-light); color: var(--red); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 0.85rem; }
+th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #f1f3f5; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total { font-weight: 700; background: #f8f9fa; }
+tr.total td { border-top: 2px solid var(--text); }
+tr.highlight-row { background: var(--green-light); }
+tr.warning-row { background: var(--amber-light); }
+tr.danger-row { background: var(--red-light); }
+.input-group { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.input-group label { font-size: 0.85rem; min-width: 240px; }
+.input-group input, .input-group select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; width: 120px; }
+.input-group input:focus { outline: 2px solid var(--blue); border-color: var(--blue); }
+.input-group .unit { font-size: 0.8rem; color: var(--muted); }
+button { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+button:hover { opacity: 0.9; }
+.note { font-size: 0.8rem; color: var(--muted); font-style: italic; margin: 4px 0; }
+.section { margin-bottom: 32px; }
+.flex-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.flex-row > * { flex: 1; min-width: 300px; }
+.verdict { font-size: 1rem; font-weight: 700; padding: 12px 16px; border-radius: 8px; margin: 12px 0; }
+.verdict-go { background: var(--green-light); color: var(--green); }
+.verdict-caution { background: var(--amber-light); color: var(--amber); }
+.verdict-no { background: var(--red-light); color: var(--red); }
+@media print {
+  body { padding: 0; font-size: 11px; }
+  .no-print { display: none; }
+  .card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Claro DR — Commercial Options Model</h1>
+  <p class="subtitle">Versa AI | Confidential | April 2026</p>
+
+  <!-- ============ INPUTS ============ -->
+  <div class="section no-print">
+    <h2>Adjustable Inputs</h2>
+    <div class="flex-row">
+      <div class="card">
+        <h3>Pilot Parameters</h3>
+        <div class="input-group"><label>Leads per period (5 weeks)</label><input type="number" id="in_leads" value="90695"><span class="unit">leads</span></div>
+        <div class="input-group"><label>Contact rate (VERSA automated)</label><input type="number" id="in_contactRate" value="35" step="1"><span class="unit">%</span></div>
+        <div class="input-group"><label>Blended conversion rate</label><input type="number" id="in_convRate" value="1.96" step="0.1"><span class="unit">%</span></div>
+        <div class="input-group"><label>Blended commission per sale</label><input type="number" id="in_commPerSale" value="13.59" step="0.5"><span class="unit">USD</span></div>
+        <div class="input-group"><label>Bonus revenue per period</label><input type="number" id="in_bonusPerPeriod" value="9693" step="100"><span class="unit">USD</span></div>
+        <div class="input-group"><label>Campaign periods per year</label><input type="number" id="in_periodsPerYear" value="10"><span class="unit">periods</span></div>
+        <div class="input-group"><label>Agent HC (post-VERSA)</label><input type="number" id="in_agents" value="8"></div>
+        <div class="input-group"><label>Agent cost per period</label><input type="number" id="in_agentCost" value="1000"><span class="unit">USD/head</span></div>
+      </div>
+      <div class="card">
+        <h3>VERSA Platform Costs</h3>
+        <div class="input-group"><label>SMS per lead</label><input type="number" id="in_smsPerLead" value="2"></div>
+        <div class="input-group"><label>SMS cost</label><input type="number" id="in_smsCost" value="0.018" step="0.001"><span class="unit">USD/SMS</span></div>
+        <div class="input-group"><label>AHT screening per contact (min)</label><input type="number" id="in_aht" value="1.5" step="0.5"><span class="unit">min</span></div>
+        <div class="input-group"><label>AHT cost per minute</label><input type="number" id="in_ahtCost" value="0.15" step="0.01"><span class="unit">USD/min</span></div>
+        <div class="input-group"><label>Dial cost per dial</label><input type="number" id="in_dialCost" value="0.00" step="0.01"><span class="unit">USD</span></div>
+        <div class="input-group"><label>Dials per lead</label><input type="number" id="in_dialsPerLead" value="6"></div>
+        <h3>Commercial Levers</h3>
+        <div class="input-group"><label>VT commission (% of topline)</label><input type="number" id="in_vtComm" value="5" step="0.5"><span class="unit">%</span></div>
+        <div class="input-group"><label>VERSA build cost (one-off)</label><input type="number" id="in_buildCost" value="50000"><span class="unit">USD</span></div>
+        <div class="input-group"><label>Target gross margin (VERSA)</label><input type="number" id="in_targetMargin" value="50" step="5"><span class="unit">%</span></div>
+      </div>
+      <div class="card">
+        <h3>Option-Specific Inputs</h3>
+        <p class="note">Option B: Commission + Platform Fee</p>
+        <div class="input-group"><label>Monthly platform fee</label><input type="number" id="in_platformFee" value="5000" step="500"><span class="unit">USD/month</span></div>
+        <p class="note">Option C: Per-Lead Processing Fee + Commission</p>
+        <div class="input-group"><label>Per-lead processing fee</label><input type="number" id="in_perLeadFee" value="0.15" step="0.01"><span class="unit">USD/lead</span></div>
+        <div class="input-group"><label>Commission share retained by VERSA</label><input type="number" id="in_commShareVersa" value="80" step="5"><span class="unit">%</span></div>
+        <p class="note">Option D: Expansion Guarantee</p>
+        <div class="input-group"><label>Monthly pre-payment if no care expansion</label><input type="number" id="in_expansionPayment" value="25000" step="1000"><span class="unit">USD/month</span></div>
+        <div class="input-group"><label>Grace period before pre-payment starts</label><input type="number" id="in_gracePeriod" value="6" step="1"><span class="unit">months</span></div>
+        <p class="note">Inbound Care Estimates</p>
+        <div class="input-group"><label>Est. Claro DR inbound calls/month</label><input type="number" id="in_careCalls" value="650000" step="50000"><span class="unit">calls</span></div>
+        <div class="input-group"><label>Est. Claro DR inbound chats/month</label><input type="number" id="in_careChats" value="325000" step="50000"><span class="unit">chats</span></div>
+        <div class="input-group"><label>Price per billable care call</label><input type="number" id="in_carePrice" value="0.75" step="0.05"><span class="unit">USD</span></div>
+        <div class="input-group"><label>Price per billable chat</label><input type="number" id="in_careChatPrice" value="0.35" step="0.05"><span class="unit">USD</span></div>
+        <div class="input-group"><label>Est. containment rate</label><input type="number" id="in_careContainment" value="50" step="5"><span class="unit">%</span></div>
+      </div>
+    </div>
+    <button onclick="recalc()">Recalculate All Options</button>
+  </div>
+
+  <!-- ============ OPTION COMPARISON ============ -->
+  <div class="section">
+    <h2>Side-by-Side Option Comparison (Pilot Scale — Annual)</h2>
+    <table id="tblCompare">
+      <thead><tr><th>Metric</th><th>A: Pure Commission<br>(Status Quo)</th><th>B: Commission +<br>Platform Fee</th><th>C: Per-Lead Fee +<br>Commission Share</th><th>D: Commission +<br>Expansion Guarantee</th></tr></thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+    <div id="verdictContainer"></div>
+  </div>
+
+  <!-- ============ OPTION DETAILS ============ -->
+  <div class="section">
+    <h2>Option Detail Breakdowns</h2>
+    <div class="cards" id="optionCards"></div>
+  </div>
+
+  <!-- ============ EXPANSION SCENARIOS ============ -->
+  <div class="section">
+    <h2>Scale Scenarios (Annual) — Recommended Option</h2>
+    <table id="tblScale">
+      <thead><tr><th>Metric</th><th>Pilot (17 seats)</th><th>200-Seat Expansion</th><th>+ Inbound Care</th></tr></thead>
+      <tbody id="scaleBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ============ INBOUND CARE OPPORTUNITY ============ -->
+  <div class="section">
+    <h2>Inbound Care — The Real Prize</h2>
+    <div class="cards">
+      <div class="card highlight" id="careCard"></div>
+      <div class="card" id="careCompareCard"></div>
+    </div>
+  </div>
+
+  <!-- ============ BOARD DECISION MATRIX ============ -->
+  <div class="section">
+    <h2>Board Decision Matrix</h2>
+    <table id="tblBoard">
+      <thead><tr><th>Criterion</th><th>A: Pure Commission</th><th>B: + Platform Fee</th><th>C: Per-Lead + Share</th><th>D: + Expansion Guarantee</th></tr></thead>
+      <tbody id="boardBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ============ RECOMMENDED STRUCTURE ============ -->
+  <div class="section">
+    <h2>Recommended Commercial Structure</h2>
+    <div id="recommendation" class="card highlight"></div>
+  </div>
+
+</div>
+
+<script>
+function fmt(n) { return n < 0 ? '-$' + Math.abs(n).toLocaleString('en-US', {maximumFractionDigits:0}) : '$' + n.toLocaleString('en-US', {maximumFractionDigits:0}); }
+function fmtPct(n) { return (n * 100).toFixed(1) + '%'; }
+function pct(n) { return n.toFixed(1) + '%'; }
+
+function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function recalc() {
+  // === Read inputs ===
+  const leads = val('in_leads');
+  const contactRate = val('in_contactRate') / 100;
+  const convRate = val('in_convRate') / 100;
+  const commPerSale = val('in_commPerSale');
+  const bonusPerPeriod = val('in_bonusPerPeriod');
+  const periodsPerYear = val('in_periodsPerYear');
+  const agents = val('in_agents');
+  const agentCost = val('in_agentCost');
+  const smsPerLead = val('in_smsPerLead');
+  const smsCost = val('in_smsCost');
+  const aht = val('in_aht');
+  const ahtCost = val('in_ahtCost');
+  const dialCost = val('in_dialCost');
+  const dialsPerLead = val('in_dialsPerLead');
+  const vtComm = val('in_vtComm') / 100;
+  const buildCost = val('in_buildCost');
+  const targetMargin = val('in_targetMargin') / 100;
+  const platformFee = val('in_platformFee');
+  const perLeadFee = val('in_perLeadFee');
+  const commShareVersa = val('in_commShareVersa') / 100;
+  const expansionPayment = val('in_expansionPayment');
+  const gracePeriod = val('in_gracePeriod');
+  const careCalls = val('in_careCalls');
+  const carePrice = val('in_carePrice');
+  const careContainment = val('in_careContainment') / 100;
+
+  // === Derived per-period ===
+  const contacts = leads * contactRate;
+  const sales = contacts * convRate;
+  const baseRevenue = sales * commPerSale;
+  const totalRevenue = baseRevenue + bonusPerPeriod;
+
+  // Costs per period
+  const agentCostTotal = agents * agentCost;
+  const smsCostTotal = leads * smsPerLead * smsCost;
+  const dialCostTotal = leads * dialsPerLead * dialCost;
+  const ahtCostTotal = contacts * aht * ahtCost;
+  const versaPlatformCosts = smsCostTotal + dialCostTotal + ahtCostTotal;
+  const totalRunningCosts = agentCostTotal + versaPlatformCosts;
+
+  // VT takes agent costs + commission %
+  const vtFeeBase = totalRevenue * vtComm;
+  const vtTotalBase = agentCostTotal + vtFeeBase;
+
+  // === OPTION A: Pure Commission (status quo) ===
+  const optA = {};
+  optA.versaRevenue = totalRevenue - vtTotalBase;
+  optA.versaCosts = versaPlatformCosts;
+  optA.versaMargin = optA.versaRevenue - optA.versaCosts;
+  optA.versaMarginPct = optA.versaRevenue > 0 ? optA.versaMargin / optA.versaRevenue : 0;
+  optA.annualVersaRevenue = optA.versaRevenue * periodsPerYear;
+  optA.annualVersaMargin = optA.versaMargin * periodsPerYear;
+  optA.annualVersaMarginPct = optA.versaMarginPct;
+  optA.totalClientCost = totalRevenue; // What Claro pays (commissions)
+  optA.annualTotalClientCost = optA.totalClientCost * periodsPerYear;
+  optA.paybackPeriods = optA.versaMargin > 0 ? buildCost / optA.versaMargin : Infinity;
+  optA.year1Margin = optA.annualVersaMargin - buildCost;
+
+  // === OPTION B: Commission + Platform Fee ===
+  const optB = {};
+  const platformFeePeriod = platformFee * (5 * 7 / 30); // ~5 weeks worth of monthly fee
+  optB.versaRevenue = totalRevenue - vtTotalBase + platformFeePeriod;
+  optB.versaCosts = versaPlatformCosts;
+  optB.versaMargin = optB.versaRevenue - optB.versaCosts;
+  optB.versaMarginPct = optB.versaRevenue > 0 ? optB.versaMargin / optB.versaRevenue : 0;
+  optB.annualVersaRevenue = optB.versaRevenue * periodsPerYear;
+  optB.annualVersaMargin = optB.versaMargin * periodsPerYear;
+  optB.annualVersaMarginPct = optB.versaMarginPct;
+  optB.totalClientCost = totalRevenue + platformFeePeriod;
+  optB.annualTotalClientCost = optB.totalClientCost * periodsPerYear;
+  optB.platformFeeAnnual = platformFee * 12;
+  optB.paybackPeriods = optB.versaMargin > 0 ? buildCost / optB.versaMargin : Infinity;
+  optB.year1Margin = optB.annualVersaMargin - buildCost;
+
+  // === OPTION C: Per-Lead Fee + Commission Share ===
+  const optC = {};
+  const leadFeeRevenue = leads * perLeadFee;
+  const commShareRevenue = totalRevenue * commShareVersa;
+  const vtShareC = totalRevenue * (1 - commShareVersa); // VT gets the rest of commissions
+  // VT still recovers agent costs separately
+  optC.versaRevenue = leadFeeRevenue + commShareRevenue - (agentCostTotal * 0); // VERSA doesn't pay agents
+  // Actually: in this model, Claro pays commissions. VT recovers agents + their share. VERSA gets lead fee + its commission share.
+  // Let's simplify: total pot = leadFeeRevenue + totalRevenue. VT gets agent costs + vtComm% of commission revenue. VERSA gets leadFeeRevenue + rest.
+  const vtFeeC = totalRevenue * vtComm;
+  const vtTotalC = agentCostTotal + vtFeeC;
+  optC.versaRevenue = leadFeeRevenue + totalRevenue - vtTotalC;
+  optC.versaCosts = versaPlatformCosts;
+  optC.versaMargin = optC.versaRevenue - optC.versaCosts;
+  optC.versaMarginPct = optC.versaRevenue > 0 ? optC.versaMargin / optC.versaRevenue : 0;
+  optC.annualVersaRevenue = optC.versaRevenue * periodsPerYear;
+  optC.annualVersaMargin = optC.versaMargin * periodsPerYear;
+  optC.annualVersaMarginPct = optC.versaMarginPct;
+  optC.totalClientCost = totalRevenue + leadFeeRevenue;
+  optC.annualTotalClientCost = optC.totalClientCost * periodsPerYear;
+  optC.paybackPeriods = optC.versaMargin > 0 ? buildCost / optC.versaMargin : Infinity;
+  optC.year1Margin = optC.annualVersaMargin - buildCost;
+
+  // === OPTION D: Commission + Expansion Guarantee ===
+  // Same as Option A for the sales pilot, but with expansion guarantee economics
+  const optD = {};
+  optD.versaRevenue = optA.versaRevenue; // Same as A for pilot
+  optD.versaCosts = optA.versaCosts;
+  optD.versaMargin = optA.versaMargin;
+  optD.versaMarginPct = optA.versaMarginPct;
+  // But factor in expansion guarantee: after grace period, monthly pre-payments kick in
+  const monthsOfPrePayment = Math.max(0, 12 - gracePeriod); // Assume 12 month horizon, first year
+  const expansionGuaranteeYear1 = expansionPayment * monthsOfPrePayment;
+  optD.annualVersaRevenue = optA.annualVersaRevenue + expansionGuaranteeYear1;
+  optD.annualVersaMargin = optA.annualVersaMargin + expansionGuaranteeYear1;
+  optD.annualVersaMarginPct = optD.annualVersaRevenue > 0 ? optD.annualVersaMargin / optD.annualVersaRevenue : 0;
+  optD.totalClientCost = optA.totalClientCost;
+  optD.annualTotalClientCost = optA.annualTotalClientCost + expansionGuaranteeYear1;
+  optD.expansionGuarantee = expansionGuaranteeYear1;
+  optD.paybackPeriods = optA.versaMargin > 0 ? buildCost / optA.versaMargin : Infinity;
+  optD.year1Margin = optD.annualVersaMargin - buildCost;
+
+  // === Inbound Care opportunity ===
+  const careChats = val('in_careChats');
+  const careChatPrice = val('in_careChatPrice');
+  const billableCare = careCalls * careContainment;
+  const billableChats = careChats * careContainment;
+  const careCallRevenueMonthly = billableCare * carePrice;
+  const careChatRevenueMonthly = billableChats * careChatPrice;
+  const careRevenueMonthly = careCallRevenueMonthly + careChatRevenueMonthly;
+  const careRevenueAnnual = careRevenueMonthly * 12;
+  const careBuildCost = buildCost * 3.5; // 3-4x, use 3.5x
+  // Assume 65% gross margin on care (much better economics than sales)
+  const careMarginPct = 0.65;
+  const careMarginAnnual = careRevenueAnnual * careMarginPct;
+
+  // === RENDER COMPARISON TABLE ===
+  const rows = [
+    ['VERSA Revenue (per period)', fmt(optA.versaRevenue), fmt(optB.versaRevenue), fmt(optC.versaRevenue), fmt(optD.versaRevenue)],
+    ['VERSA Platform Costs (per period)', fmt(optA.versaCosts), fmt(optB.versaCosts), fmt(optC.versaCosts), fmt(optD.versaCosts)],
+    ['VERSA Margin (per period)', fmt(optA.versaMargin), fmt(optB.versaMargin), fmt(optC.versaMargin), fmt(optD.versaMargin)],
+    ['VERSA Gross Margin %', pct(optA.versaMarginPct*100), pct(optB.versaMarginPct*100), pct(optC.versaMarginPct*100), pct(optD.versaMarginPct*100)],
+    ['---', '', '', '', ''],
+    ['VERSA Annual Revenue', fmt(optA.annualVersaRevenue), fmt(optB.annualVersaRevenue), fmt(optC.annualVersaRevenue), fmt(optD.annualVersaRevenue)],
+    ['VERSA Annual Margin (before build)', fmt(optA.annualVersaMargin), fmt(optB.annualVersaMargin), fmt(optC.annualVersaMargin), fmt(optD.annualVersaMargin)],
+    ['Build Cost Recovery (periods)', optA.paybackPeriods === Infinity ? 'Never' : optA.paybackPeriods.toFixed(1), optB.paybackPeriods === Infinity ? 'Never' : optB.paybackPeriods.toFixed(1), optC.paybackPeriods === Infinity ? 'Never' : optC.paybackPeriods.toFixed(1), optD.paybackPeriods === Infinity ? 'Never' : optD.paybackPeriods.toFixed(1)],
+    ['Year 1 Net Margin (after build cost)', fmt(optA.year1Margin), fmt(optB.year1Margin), fmt(optC.year1Margin), fmt(optD.year1Margin)],
+    ['---', '', '', '', ''],
+    ['Total Cost to Claro (annual)', fmt(optA.annualTotalClientCost), fmt(optB.annualTotalClientCost), fmt(optC.annualTotalClientCost), fmt(optD.annualTotalClientCost)],
+    ['Meets ' + pct(targetMargin*100) + ' Margin Target?', optA.versaMarginPct >= targetMargin ? 'YES' : 'NO', optB.versaMarginPct >= targetMargin ? 'YES' : 'NO', optC.versaMarginPct >= targetMargin ? 'YES' : 'NO', optD.annualVersaMarginPct >= targetMargin ? 'YES (blended)' : 'NO'],
+  ];
+
+  let html = '';
+  rows.forEach(r => {
+    if (r[0] === '---') {
+      html += '<tr><td colspan="5" style="border:none;height:8px"></td></tr>';
+      return;
+    }
+    const isTotal = r[0].includes('Year 1') || r[0].includes('Meets');
+    const isMet = r[0].includes('Meets');
+    let cls = isTotal ? ' class="total"' : '';
+    html += `<tr${cls}>`;
+    html += `<td>${r[0]}</td>`;
+    for (let i = 1; i <= 4; i++) {
+      let cellCls = '';
+      if (isMet) {
+        cellCls = r[i].includes('YES') ? ' class="num" style="color:var(--green);font-weight:700"' : ' class="num" style="color:var(--red);font-weight:700"';
+      } else {
+        cellCls = ' class="num"';
+      }
+      html += `<td${cellCls}>${r[i]}</td>`;
+    }
+    html += '</tr>';
+  });
+  document.getElementById('compareBody').innerHTML = html;
+
+  // === VERDICT ===
+  let bestOption = 'D';
+  let verdictClass = 'verdict-caution';
+  let verdictText = '';
+
+  if (optA.versaMarginPct >= targetMargin) {
+    verdictText = `Option A (Pure Commission) already meets the ${pct(targetMargin*100)} margin target at ${pct(optA.versaMarginPct*100)}. However, it offers zero downside protection. Recommend combining with Option D's expansion guarantee for risk mitigation.`;
+    verdictClass = 'verdict-caution';
+  } else if (optB.versaMarginPct >= targetMargin) {
+    verdictText = `Option B (Commission + Platform Fee of ${fmt(platformFee)}/month) meets the margin target. This is the simplest path to Board approval.`;
+    verdictClass = 'verdict-go';
+    bestOption = 'B';
+  } else {
+    verdictText = `No single option meets the ${pct(targetMargin*100)} margin target on pilot economics alone. The recommended approach is a hybrid: Accept the pilot at Option A/B economics as a strategic investment, but only with Option D's expansion guarantee into inbound care — where the real margin exists (est. ${fmt(careRevenueAnnual)}/year at ${pct(careMarginPct*100)} margin).`;
+    verdictClass = 'verdict-caution';
+  }
+  document.getElementById('verdictContainer').innerHTML = `<div class="verdict ${verdictClass}">${verdictText}</div>`;
+
+  // === OPTION DETAIL CARDS ===
+  let cardsHtml = '';
+
+  // Option A
+  const aClass = optA.versaMarginPct >= targetMargin ? 'highlight' : (optA.versaMarginPct > 0.2 ? 'warning' : 'danger');
+  cardsHtml += `<div class="card ${aClass}">
+    <h3>Option A: Pure Commission <span class="badge ${optA.versaMarginPct >= targetMargin ? 'badge-green' : 'badge-red'}">${pct(optA.versaMarginPct*100)} margin</span></h3>
+    <p><strong>Structure:</strong> Commission-only from Claro, VT recovers agents + ${pct(vtComm*100)} fee</p>
+    <table>
+      <tr><td>Commission revenue</td><td class="num">${fmt(totalRevenue)}/period</td></tr>
+      <tr><td>VT take (agents + fee)</td><td class="num">${fmt(vtTotalBase)}/period</td></tr>
+      <tr><td>VERSA revenue</td><td class="num">${fmt(optA.versaRevenue)}/period</td></tr>
+      <tr><td>VERSA platform costs</td><td class="num">${fmt(optA.versaCosts)}/period</td></tr>
+      <tr class="total"><td>VERSA margin</td><td class="num">${fmt(optA.versaMargin)}/period</td></tr>
+      <tr><td>Annual margin</td><td class="num">${fmt(optA.annualVersaMargin)}</td></tr>
+      <tr><td>Year 1 (net of build)</td><td class="num">${fmt(optA.year1Margin)}</td></tr>
+    </table>
+    <p class="note">Risk: Zero floor. Lead quality, FX, chargeback all sit with VERSA.</p>
+  </div>`;
+
+  // Option B
+  const bClass = optB.versaMarginPct >= targetMargin ? 'highlight' : 'warning';
+  cardsHtml += `<div class="card ${bClass}">
+    <h3>Option B: Commission + Platform Fee <span class="badge ${optB.versaMarginPct >= targetMargin ? 'badge-green' : 'badge-amber'}">${pct(optB.versaMarginPct*100)} margin</span></h3>
+    <p><strong>Structure:</strong> Same as A, plus ${fmt(platformFee)}/month technology platform fee from Claro</p>
+    <table>
+      <tr><td>Commission revenue</td><td class="num">${fmt(totalRevenue)}/period</td></tr>
+      <tr><td>Platform fee</td><td class="num">${fmt(platformFeePeriod)}/period</td></tr>
+      <tr><td>VT take</td><td class="num">${fmt(vtTotalBase)}/period</td></tr>
+      <tr><td>VERSA revenue</td><td class="num">${fmt(optB.versaRevenue)}/period</td></tr>
+      <tr><td>VERSA platform costs</td><td class="num">${fmt(optB.versaCosts)}/period</td></tr>
+      <tr class="total"><td>VERSA margin</td><td class="num">${fmt(optB.versaMargin)}/period</td></tr>
+      <tr><td>Annual margin</td><td class="num">${fmt(optB.annualVersaMargin)}</td></tr>
+      <tr><td>Platform fee annual</td><td class="num">${fmt(optB.platformFeeAnnual)}</td></tr>
+      <tr><td>Year 1 (net of build)</td><td class="num">${fmt(optB.year1Margin)}</td></tr>
+    </table>
+    <p class="note">Positions VERSA as tech provider, not just BPO. Creates a revenue floor.</p>
+  </div>`;
+
+  // Option C
+  const cClass = optC.versaMarginPct >= targetMargin ? 'highlight' : 'warning';
+  cardsHtml += `<div class="card ${cClass}">
+    <h3>Option C: Per-Lead Fee + Commission <span class="badge ${optC.versaMarginPct >= targetMargin ? 'badge-green' : 'badge-amber'}">${pct(optC.versaMarginPct*100)} margin</span></h3>
+    <p><strong>Structure:</strong> ${fmt(perLeadFee)} per lead processed + full commission pass-through (VT takes agents + ${pct(vtComm*100)})</p>
+    <table>
+      <tr><td>Lead processing fee</td><td class="num">${fmt(leadFeeRevenue)}/period</td></tr>
+      <tr><td>Commission revenue</td><td class="num">${fmt(totalRevenue)}/period</td></tr>
+      <tr><td>VT take</td><td class="num">${fmt(vtTotalC)}/period</td></tr>
+      <tr><td>VERSA revenue</td><td class="num">${fmt(optC.versaRevenue)}/period</td></tr>
+      <tr><td>VERSA platform costs</td><td class="num">${fmt(optC.versaCosts)}/period</td></tr>
+      <tr class="total"><td>VERSA margin</td><td class="num">${fmt(optC.versaMargin)}/period</td></tr>
+      <tr><td>Annual margin</td><td class="num">${fmt(optC.annualVersaMargin)}</td></tr>
+      <tr><td>Year 1 (net of build)</td><td class="num">${fmt(optC.year1Margin)}</td></tr>
+    </table>
+    <p class="note">Charges for the automation work regardless of sales outcome. May be harder to sell to Claro.</p>
+  </div>`;
+
+  // Option D
+  cardsHtml += `<div class="card highlight">
+    <h3>Option D: Commission + Expansion Guarantee <span class="badge badge-blue">RECOMMENDED</span></h3>
+    <p><strong>Structure:</strong> Pilot on commission terms (Option A), but with contractual expansion guarantee into inbound care. If Claro doesn't deliver care volumes within ${gracePeriod} months, ${fmt(expansionPayment)}/month pre-payment kicks in.</p>
+    <table>
+      <tr><td>Pilot margin (same as Option A)</td><td class="num">${fmt(optA.annualVersaMargin)}/year</td></tr>
+      <tr><td>Expansion guarantee (months ${gracePeriod+1}-12)</td><td class="num">${fmt(expansionGuaranteeYear1)}/year</td></tr>
+      <tr class="total"><td>Total Year 1 VERSA revenue</td><td class="num">${fmt(optD.annualVersaRevenue)}</td></tr>
+      <tr class="total"><td>Year 1 net margin (after build)</td><td class="num">${fmt(optD.year1Margin)}</td></tr>
+      <tr><td>Blended margin</td><td class="num">${pct(optD.annualVersaMarginPct*100)}</td></tr>
+    </table>
+    <p class="note"><strong>The logic:</strong> Accept thin sales margins as a strategic entry point, but only if Claro commits to a pathway to care. The pre-payment is NOT a penalty — it's a credit against future care billable calls (same as Telstra Schedule 8). Claro is incentivized to move fast on care to avoid the payments, and if they don't, VERSA recoups investment.</p>
+  </div>`;
+
+  document.getElementById('optionCards').innerHTML = cardsHtml;
+
+  // === SCALE SCENARIOS ===
+  const scaleFactor200 = 200 / 17;
+  const scaleRows = [
+    { label: 'SALES PILOT', header: true },
+    { label: 'Leads / period', vals: [leads.toLocaleString(), Math.round(leads * scaleFactor200).toLocaleString(), Math.round(leads * scaleFactor200).toLocaleString()] },
+    { label: 'Sales revenue / period', vals: [fmt(totalRevenue), fmt(totalRevenue * scaleFactor200), fmt(totalRevenue * scaleFactor200)] },
+    { label: 'VERSA margin / period (sales)', vals: [fmt(optA.versaMargin), fmt(optA.versaMargin * scaleFactor200), fmt(optA.versaMargin * scaleFactor200)] },
+    { label: 'Annual VERSA margin (sales)', vals: [fmt(optA.annualVersaMargin), fmt(optA.annualVersaMargin * scaleFactor200), fmt(optA.annualVersaMargin * scaleFactor200)] },
+    { label: 'INBOUND CARE (VOICE + CHAT)', header: true },
+    { label: 'Monthly inbound calls', vals: ['—', '—', careCalls.toLocaleString()] },
+    { label: 'Monthly inbound chats', vals: ['—', '—', careChats.toLocaleString()] },
+    { label: 'Billable calls (' + pct(careContainment*100) + ' containment)', vals: ['—', '—', billableCare.toLocaleString()] },
+    { label: 'Billable chats (' + pct(careContainment*100) + ' containment)', vals: ['—', '—', billableChats.toLocaleString()] },
+    { label: 'Care revenue / month (voice + chat)', vals: ['—', '—', fmt(careRevenueMonthly)] },
+    { label: 'Care revenue / year', vals: ['—', '—', fmt(careRevenueAnnual)] },
+    { label: 'Care margin / year (est. ' + pct(careMarginPct*100) + ')', vals: ['—', '—', fmt(careMarginAnnual)] },
+    { label: 'COMBINED', header: true },
+    { label: 'Total VERSA annual revenue', vals: [fmt(optA.annualVersaRevenue), fmt(optA.annualVersaRevenue * scaleFactor200), fmt(optA.annualVersaRevenue * scaleFactor200 + careRevenueAnnual)], total: true },
+    { label: 'Total VERSA annual margin', vals: [fmt(optA.annualVersaMargin), fmt(optA.annualVersaMargin * scaleFactor200), fmt(optA.annualVersaMargin * scaleFactor200 + careMarginAnnual)], total: true },
+  ];
+
+  let scaleHtml = '';
+  scaleRows.forEach(r => {
+    if (r.header) {
+      scaleHtml += `<tr><td colspan="4" style="font-weight:700;background:#e9ecef;padding-top:10px">${r.label}</td></tr>`;
+    } else {
+      const cls = r.total ? ' class="total"' : '';
+      scaleHtml += `<tr${cls}><td>${r.label}</td>${r.vals.map(v => `<td class="num">${v}</td>`).join('')}</tr>`;
+    }
+  });
+  document.getElementById('scaleBody').innerHTML = scaleHtml;
+
+  // === CARE CARD ===
+  document.getElementById('careCard').innerHTML = `
+    <h3>Inbound Care Opportunity — Claro DR</h3>
+    <p class="note">Based on ~6.5M subscribers, ~15% monthly contact rate (LatAm telco benchmark)</p>
+    <table>
+      <tr><td colspan="2" style="font-weight:600;background:#f1f3f5">Voice</td></tr>
+      <tr><td>Estimated inbound calls/month</td><td class="num">${careCalls.toLocaleString()}</td></tr>
+      <tr><td>Billable calls (${pct(careContainment*100)} containment)</td><td class="num">${billableCare.toLocaleString()}</td></tr>
+      <tr><td>Price per billable call</td><td class="num">${fmt(carePrice)}</td></tr>
+      <tr><td>Voice revenue/month</td><td class="num">${fmt(careCallRevenueMonthly)}</td></tr>
+      <tr><td colspan="2" style="font-weight:600;background:#f1f3f5">Chat</td></tr>
+      <tr><td>Estimated inbound chats/month</td><td class="num">${careChats.toLocaleString()}</td></tr>
+      <tr><td>Billable chats (${pct(careContainment*100)} containment)</td><td class="num">${billableChats.toLocaleString()}</td></tr>
+      <tr><td>Price per billable chat</td><td class="num">${fmt(careChatPrice)}</td></tr>
+      <tr><td>Chat revenue/month</td><td class="num">${fmt(careChatRevenueMonthly)}</td></tr>
+      <tr><td colspan="2" style="font-weight:600;background:#f1f3f5">Combined</td></tr>
+      <tr class="total"><td>Total monthly revenue</td><td class="num">${fmt(careRevenueMonthly)}</td></tr>
+      <tr class="total"><td>Total annual revenue</td><td class="num">${fmt(careRevenueAnnual)}</td></tr>
+      <tr><td>Est. gross margin</td><td class="num">${pct(careMarginPct*100)}</td></tr>
+      <tr class="total"><td>Annual margin</td><td class="num">${fmt(careMarginAnnual)}</td></tr>
+      <tr><td>Build cost (est.)</td><td class="num">${fmt(careBuildCost)}</td></tr>
+    </table>
+  `;
+
+  document.getElementById('careCompareCard').innerHTML = `
+    <h3>Why Care Matters — Sales vs Care</h3>
+    <table>
+      <tr><th>Metric</th><th>Outbound Sales (pilot)</th><th>Inbound Care</th></tr>
+      <tr><td>Revenue model</td><td>Commission (outcome-dependent)</td><td>Per-call (outcome-independent)</td></tr>
+      <tr><td>Revenue per year</td><td>${fmt(optA.annualVersaRevenue)}</td><td>${fmt(careRevenueAnnual)}</td></tr>
+      <tr><td>Margin per year</td><td>${fmt(optA.annualVersaMargin)}</td><td>${fmt(careMarginAnnual)}</td></tr>
+      <tr><td>Revenue predictability</td><td><span class="badge badge-red">Low</span></td><td><span class="badge badge-green">High</span></td></tr>
+      <tr><td>Client dependency</td><td><span class="badge badge-red">Lead quality + volume</span></td><td><span class="badge badge-green">Stable call volumes</span></td></tr>
+      <tr><td>Chargeback risk</td><td><span class="badge badge-red">Yes (180-day clawback)</span></td><td><span class="badge badge-green">None</span></td></tr>
+      <tr class="total"><td>Care is ${(careRevenueAnnual / Math.max(optA.annualVersaRevenue, 1)).toFixed(0)}x the revenue and ${(careMarginAnnual / Math.max(optA.annualVersaMargin, 1)).toFixed(0)}x the margin of the sales pilot</td><td colspan="2"></td></tr>
+    </table>
+  `;
+
+  // === BOARD DECISION MATRIX ===
+  const boardRows = [
+    ['Meets margin target', optA.versaMarginPct >= targetMargin ? 'green' : 'red', optB.versaMarginPct >= targetMargin ? 'green' : 'amber', optC.versaMarginPct >= targetMargin ? 'green' : 'amber', 'green'],
+    ['Downside protection', 'red', 'amber', 'amber', 'green'],
+    ['Path to care volumes', 'red', 'red', 'red', 'green'],
+    ['Ease of sell to Claro', 'green', 'amber', 'red', 'amber'],
+    ['Build cost recovery', optA.paybackPeriods <= 5 ? 'green' : 'amber', optB.paybackPeriods <= 5 ? 'green' : 'amber', optC.paybackPeriods <= 5 ? 'green' : 'amber', 'green'],
+    ['Strategic value (LatAm ref)', 'amber', 'amber', 'amber', 'green'],
+    ['Recurring revenue quality', 'red', 'amber', 'amber', 'green'],
+  ];
+
+  const colorMap = { green: '&#x2705;', amber: '&#x1F7E1;', red: '&#x274C;' };
+  let boardHtml = '';
+  boardRows.forEach(r => {
+    boardHtml += `<tr><td>${r[0]}</td>`;
+    for (let i = 1; i <= 4; i++) {
+      boardHtml += `<td style="text-align:center">${colorMap[r[i]]}</td>`;
+    }
+    boardHtml += '</tr>';
+  });
+  document.getElementById('boardBody').innerHTML = boardHtml;
+
+  // === RECOMMENDATION ===
+  document.getElementById('recommendation').innerHTML = `
+    <h3>Recommended Structure: Option B + D Hybrid</h3>
+    <p>Combine a modest platform fee (Option B) with an expansion guarantee into inbound care (Option D). This gives you:</p>
+    <table>
+      <tr><td><strong>1. Technology Platform Fee</strong></td><td>${fmt(platformFee)}/month — positions VERSA as a tech provider, creates a floor, partially recoups build cost regardless of sales performance. Justified by the automation infrastructure VERSA is building.</td></tr>
+      <tr><td><strong>2. Commission Pass-Through</strong></td><td>Standard commission structure from Claro, with VT recovering agents + ${pct(vtComm*100)} fee. VERSA receives the balance.</td></tr>
+      <tr><td><strong>3. Expansion Guarantee</strong></td><td>Claro commits to introducing inbound care volumes within ${gracePeriod} months. If not delivered, monthly pre-payment of ${fmt(expansionPayment)} kicks in (credited against future care billable calls). Modeled on Telstra Schedule 8.</td></tr>
+      <tr><td><strong>4. Minimum Lead Supply SLA</strong></td><td>Claro commits to ≥90% of pilot-implied lead volumes per period (~${Math.round(leads * 0.9).toLocaleString()} leads). Make-good payment if below.</td></tr>
+      <tr><td><strong>5. Minimum Commitment</strong></td><td>6-month / 3-period minimum with early exit penalty = unamortized build cost.</td></tr>
+      <tr><td><strong>6. Right of First Refusal</strong></td><td>VERSA gets first right on any AI-assisted customer interaction expansion across Claro DR (and ideally América Móvil footprint).</td></tr>
+    </table>
+    <h3 style="margin-top:16px">Year 1 Economics (B+D Hybrid)</h3>
+    <table>
+      <tr><td>Sales pilot margin</td><td class="num">${fmt(optB.annualVersaMargin)}</td></tr>
+      <tr><td>Expansion guarantee (if care not delivered)</td><td class="num">${fmt(expansionGuaranteeYear1)}</td></tr>
+      <tr class="total"><td>Year 1 VERSA margin (before build)</td><td class="num">${fmt(optB.annualVersaMargin + expansionGuaranteeYear1)}</td></tr>
+      <tr><td>Build cost</td><td class="num">${fmt(buildCost)}</td></tr>
+      <tr class="total"><td>Year 1 net margin</td><td class="num">${fmt(optB.annualVersaMargin + expansionGuaranteeYear1 - buildCost)}</td></tr>
+      <tr><td>If care IS delivered: additional annual revenue</td><td class="num">${fmt(careRevenueAnnual)}</td></tr>
+      <tr class="total"><td>Combined Year 2+ potential</td><td class="num">${fmt(optB.annualVersaMargin + careRevenueAnnual)}</td></tr>
+    </table>
+    <p class="note" style="margin-top:12px"><strong>Negotiation framing for Claro:</strong> "We're investing in building Spanish-language AI infrastructure for your market. The platform fee covers our technology investment. The expansion guarantee simply ensures both parties are committed to a broader partnership — if you expand to care, the pre-payments become credits. You only pay more if you choose not to expand."</p>
+  `;
+}
+
+// Initial calc
+recalc();
+</script>
+</body>
+</html>
